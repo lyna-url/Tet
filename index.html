@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f7fc">
+  <title>Consulta de IP</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      color-scheme: light;
+      --text: #202943;
+      --muted: #77819a;
+      --blue: #5268e8;
+      --blue-dark: #4055d2;
+      --border: #e7eaf2;
+      --surface: #ffffff;
+      --background: #f5f7fc;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      background:
+        radial-gradient(ellipse at 50% 0%, #e9edff 0, transparent 44%),
+        var(--background);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .card {
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid rgba(223, 228, 240, 0.9);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(37, 50, 92, 0.09);
+    }
+
+    .card-header {
+      padding: 30px 32px 25px;
+      border-bottom: 1px solid #f0f2f7;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      background: #7c8cff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px #eef0ff;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(24px, 5vw, 32px);
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .card-body {
+      padding: 26px 32px 30px;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 9px;
+      color: #414b65;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      height: 50px;
+      padding: 0 15px;
+      border: 1px solid #dfe3ed;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input::placeholder {
+      color: #a4acbd;
+    }
+
+    input:focus {
+      border-color: #8795f0;
+      box-shadow: 0 0 0 4px rgba(82, 104, 232, 0.12);
+    }
+
+    button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 11px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:focus-visible,
+    .ip-item:focus-visible {
+      outline: 3px solid rgba(82, 104, 232, 0.3);
+      outline-offset: 2px;
+    }
+
+    .primary-button {
+      padding: 0 19px;
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 5px 12px rgba(82, 104, 232, 0.2);
+    }
+
+    .primary-button:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 7px 16px rgba(82, 104, 232, 0.27);
+    }
+
+    .secondary-button {
+      padding: 0 16px;
+      background: #f2f4f9;
+      color: #59647c;
+    }
+
+    .secondary-button:hover {
+      background: #e9ecf4;
+    }
+
+    .result-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 27px 0 10px;
+    }
+
+    .result-heading h2 {
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .result-badge {
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #f1f3fa;
+      color: #79839a;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #resultado {
+      min-height: 142px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: #fafbfe;
+      line-height: 1.6;
+    }
+
+    .empty-state {
+      min-height: 104px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-icon {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      margin-bottom: 2px;
+      border-radius: 12px;
+      background: #eef0ff;
+      color: var(--blue);
+      font-size: 18px;
+    }
+
+    .empty-state strong {
+      color: #4f5a73;
+      font-size: 13px;
+    }
+
+    .empty-state span {
+      font-size: 12px;
+    }
+
+    .result-domain {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-domain-label,
+    .record-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .record-group + .record-group {
+      margin-top: 16px;
+    }
+
+    .record-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #4e5a74;
+    }
+
+    .record-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ip-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 1px solid #e1e5f0;
+      border-radius: 9px;
+      background: #fff;
+      color: #35415e;
+      cursor: pointer;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      transition: border-color 0.18s, background 0.18s, color 0.18s;
+    }
+
+    .ip-item:hover {
+      border-color: #aab4f6;
+      background: #f5f6ff;
+      color: var(--blue-dark);
+    }
+
+    .ip-item.copied {
+      border-color: #9bd5b3;
+      background: #effaf3;
+      color: #26824d;
+    }
+
+    .copy-icon {
+      color: #98a1b5;
+      font-family: inherit;
+      font-size: 11px;
+    }
+
+    .error {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: #bc4652;
+      font-size: 13px;
+    }
+
+    .error-icon {
+      display: grid;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff0f1;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .loading-state {
+      min-height: 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      color: #66718b;
+      font-size: 13px;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #dfe3fb;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .info {
+      margin-top: 13px;
+      color: #8791a7;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      z-index: 10;
+      padding: 10px 16px;
+      border-radius: 11px;
+      background: #202943;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 650;
+      box-shadow: 0 8px 24px rgba(22, 32, 59, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 8px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 540px) {
+      body {
+        padding: 16px 12px;
+      }
+
+      .card {
+        border-radius: 19px;
+      }
+
+      .card-header {
+        padding: 25px 21px 21px;
+      }
+
+      .card-body {
+        padding: 22px 21px 24px;
+      }
+
+      .input-group {
+        flex-wrap: wrap;
+      }
+
+      input {
+        flex-basis: 100%;
+      }
+
+      .primary-button {
+        flex: 1;
+      }
+
+      .secondary-button {
+        min-width: 92px;
+      }
+
+      #resultado {
+        padding: 15px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="card" aria-labelledby="titulo">
+      <header class="card-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Consulta DNS
+        </div>
+        <h1 id="titulo">Descubra o IP de um domínio</h1>
+        <p class="subtitle">
+          Consulte os endereços IPv4 e IPv6 associados a um site.
+        </p>
+      </header>
+
+      <div class="card-body">
+        <label class="input-label" for="site">Domínio ou endereço do site</label>
+
+        <div class="input-group">
+          <input
+            type="text"
+            id="site"
+            placeholder="Ex.: exemplo.com.br"
+            autocomplete="url"
+            spellcheck="false"
+            aria-label="Domínio ou endereço do site"
+          >
+          <button class="primary-button" id="buscar" type="button">Consultar</button>
+          <button class="secondary-button" id="limpar" type="button">Limpar</button>
+        </div>
+
+        <div class="result-heading">
+          <h2>Resultado da consulta</h2>
+          <span class="result-badge">DNS público</span>
+        </div>
+
+        <div id="resultado" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">◎</div>
+            <strong>A consulta aparecerá aqui</strong>
+            <span>Digite um domínio para começar.</span>
+          </div>
+        </div>
+
+        <p class="info">Toque ou clique em um endereço para copiá-lo.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Endereço copiado</div>
+
+  <script>
+    const campoSite = document.getElementById("site");
+    const resultado = document.getElementById("resultado");
+    const toast = document.getElementById("toast");
+    let toastTimer;
+
+    function limparDominio(input) {
+      if (!input) return "";
+
+      let valor = input.trim();
+
+      try {
+        const url = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(valor)
+          ? valor
+          : `https://${valor}`);
+        valor = url.hostname;
+      } catch {
+        valor = valor
+          .replace(/^(https?:\/\/)/i, "")
+          .split(/[/?#]/)[0]
+          .split(":")[0];
+      }
+
+      return valor.replace(/^www\./i, "").trim().toLowerCase();
+    }
+
+    function dominioValido(dominio) {
+      if (!dominio || dominio.length > 253) return false;
+
+      const partes = dominio.split(".");
+
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(dominio)) {
+        return partes.every(parte => Number(parte) >= 0 && Number(parte) <= 255);
+      }
+
+      return /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i
+        .test(dominio);
+    }
+
+    function mostrarToast(mensagem) {
+      toast.textContent = mensagem;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    async function copiar(texto, elemento) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else {
+          const temporario = document.createElement("textarea");
+          temporario.value = texto;
+          temporario.style.position = "fixed";
+          temporario.style.opacity = "0";
+          document.body.appendChild(temporario);
+          temporario.select();
+          document.execCommand("copy");
+          temporario.remove();
+        }
+
+        elemento.classList.add("copied");
+        setTimeout(() => elemento.classList.remove("copied"), 900);
+        mostrarToast("Endereço copiado");
+      } catch {
+        mostrarToast("Não foi possível copiar o endereço");
+      }
+    }
+
+    function criarItemCopiavel(texto, mostrarIcone = true) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "ip-item";
+      item.textContent = texto;
+      item.setAttribute("aria-label", `Copiar ${texto}`);
+
+      if (mostrarIcone) {
+        const icone = document.createElement("span");
+        icone.className = "copy-icon";
+        icone.textContent = "Copiar";
+        item.appendChild(icone);
+      }
+
+      item.addEventListener("click", () => copiar(texto, item));
+      return item;
+    }
+
+    function mostrarErro(mensagem) {
+      resultado.replaceChildren();
+
+      const erro = document.createElement("div");
+      erro.className = "error";
+
+      const icone = document.createElement("span");
+      icone.className = "error-icon";
+      icone.setAttribute("aria-hidden", "true");
+      icone.textContent = "!";
+
+      const texto = document.createElement("span");
+      texto.textContent = mensagem;
+
+      erro.append(icone, texto);
+      resultado.appendChild(erro);
+    }
+
+    function criarGrupoRegistros(titulo, registros) {
+      const grupo = document.createElement("section");
+      grupo.className = "record-group";
+
+      const label = document.createElement("span");
+      label.className = "record-label";
+      label.textContent = titulo;
+
+      const lista = document.createElement("div");
+      lista.className = "record-list";
+
+      registros.forEach(ip => lista.appendChild(criarItemCopiavel(ip)));
+
+      grupo.append(label, lista);
+      return grupo;
+    }
+
+    async function buscarIP() {
+      const dominio = limparDominio(campoSite.value);
+
+      if (!dominio) {
+        mostrarErro("Digite um domínio ou endereço de site.");
+        return;
+      }
+
+      if (!dominioValido(dominio)) {
+        mostrarErro("Esse domínio parece inválido. Confira e tente novamente.");
+        return;
+      }
+
+      resultado.innerHTML = `
+        <div class="loading-state">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Consultando os registros de ${dominio}…</span>
+        </div>
+      `;
+
+      try {
+        const [resA, resAAAA] = await Promise.all([
+          fetch(`https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=A`),
+          fetch(`https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=AAAA`)
+        ]);
+
+        if (!resA.ok || !resAAAA.ok) {
+          throw new Error("O serviço de consulta DNS não respondeu.");
+        }
+
+        const [dataA, dataAAAA] = await Promise.all([
+          resA.json(),
+          resAAAA.json()
+        ]);
+
+        const ipv4 = (dataA.Answer || [])
+          .filter(registro => registro.type === 1)
+          .map(registro => registro.data);
+
+        const ipv6 = (dataAAAA.Answer || [])
+          .filter(registro => registro.type === 28)
+          .map(registro => registro.data);
+
+        if (ipv4.length === 0 && ipv6.length === 0) {
+          mostrarErro(`Nenhum endereço IP foi encontrado para ${dominio}.`);
+          return;
+        }
+
+        resultado.replaceChildren();
+
+        const linhaDominio = document.createElement("div");
+        linhaDominio.className = "result-domain";
+
+        const labelDominio = document.createElement("span");
+        labelDominio.className = "result-domain-label";
+        labelDominio.textContent = "Domínio consultado";
+
+        linhaDominio.append(
+          labelDominio,
+          criarItemCopiavel(dominio, false)
+        );
+
+        resultado.appendChild(linhaDominio);
+
+        if (ipv4.length > 0) {
+          resultado.appendChild(criarGrupoRegistros("IPv4", ipv4));
+        }
+
+        if (ipv6.length > 0) {
+          resultado.appendChild(criarGrupoRegistros("IPv6", ipv6));
+        }
+      } catch (erro) {
+        mostrarErro(erro.message || "Erro de conexão. Tente novamente.");
+      }
+    }
+
+    function limpar() {
+      campoSite.value = "";
+      resultado.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon" aria-hidden="true">◎</div>
+          <strong>A consulta aparecerá aqui</strong>
+          <span>Digite um domínio para começar.</span>
+        </div>
+      `;
+      campoSite.focus();
+    }
+
+    document.getElementById("buscar").addEventListener("click", buscarIP);
+    document.getElementById("limpar").addEventListener("click", limpar);
+
+    campoSite.addEventListener("keydown", evento => {
+      if (evento.key === "Enter") buscarIP();
+    });
+  </script>
+</body>
+</html>
