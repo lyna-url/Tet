@@ -1,697 +1,1210 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f5f7fc">
-  <title>Consulta de IP</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1120">
+<title>DNS Lookup | Network Tools</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
 
-    :root {
-      color-scheme: light;
-      --text: #202943;
-      --muted: #77819a;
-      --blue: #5268e8;
-      --blue-dark: #4055d2;
-      --border: #e7eaf2;
-      --surface: #ffffff;
-      --background: #f5f7fc;
-    }
+:root{
+  color-scheme:dark;
+  --bg:#080e1c;
+  --surface:#111b2e;
+  --surface2:#16233a;
+  --border:#24334e;
+  --text:#eef3ff;
+  --muted:#8495b3;
+  --blue:#527cff;
+  --blue2:#3460ed;
+  --green:#32c98a;
+  --red:#ff6578;
+}
 
-    body {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 28px 16px;
-      background:
-        radial-gradient(ellipse at 50% 0%, #e9edff 0, transparent 44%),
-        var(--background);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-    }
+body{
+  min-height:100vh;
+  padding:35px 16px;
+  background:
+    radial-gradient(ellipse at 50% -15%,#1c3470 0,transparent 48%),
+    var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
 
-    .app {
-      width: 100%;
-      max-width: 680px;
-    }
+button,input{font:inherit}
+button{cursor:pointer}
 
-    .card {
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid rgba(223, 228, 240, 0.9);
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(37, 50, 92, 0.09);
-    }
+.app{
+  width:100%;
+  max-width:790px;
+  margin:auto;
+}
 
-    .card-header {
-      padding: 30px 32px 25px;
-      border-bottom: 1px solid #f0f2f7;
-    }
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:35px;
+}
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      color: var(--blue);
-      font-size: 12px;
-      font-weight: 750;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-    }
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 
-    .eyebrow-dot {
-      width: 8px;
-      height: 8px;
-      background: #7c8cff;
-      border-radius: 50%;
-      box-shadow: 0 0 0 4px #eef0ff;
-    }
+.brand-icon{
+  width:43px;height:43px;
+  display:grid;place-items:center;
+  border:1px solid #36518b;
+  border-radius:13px;
+  background:#192b50;
+  color:#85a8ff;
+}
 
-    h1 {
-      margin-bottom: 8px;
-      font-size: clamp(24px, 5vw, 32px);
-      line-height: 1.2;
-      letter-spacing: -0.04em;
-    }
+.brand-icon svg{width:23px;height:23px}
 
-    .subtitle {
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.6;
-    }
+.brand-name{
+  font-size:16px;
+  font-weight:850;
+  letter-spacing:.04em;
+}
 
-    .card-body {
-      padding: 26px 32px 30px;
-    }
+.brand-sub{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:.13em;
+}
 
-    .input-label {
-      display: block;
-      margin-bottom: 9px;
-      color: #414b65;
-      font-size: 13px;
-      font-weight: 700;
-    }
+.online{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border:1px solid #245541;
+  border-radius:30px;
+  background:#102b25;
+  color:#60dfa8;
+  font-size:11px;
+  font-weight:750;
+}
 
-    .input-group {
-      display: flex;
-      gap: 10px;
-    }
+.online-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#39d99b;
+  box-shadow:0 0 10px #39d99b;
+}
 
-    input {
-      flex: 1;
-      min-width: 0;
-      height: 50px;
-      padding: 0 15px;
-      border: 1px solid #dfe3ed;
-      border-radius: 12px;
-      outline: none;
-      background: #fff;
-      color: var(--text);
-      font: inherit;
-      font-size: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
+.hero{
+  margin-bottom:27px;
+  text-align:center;
+}
 
-    input::placeholder {
-      color: #a4acbd;
-    }
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:15px;
+  color:#8eacff;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
 
-    input:focus {
-      border-color: #8795f0;
-      box-shadow: 0 0 0 4px rgba(82, 104, 232, 0.12);
-    }
+.eyebrow:before{
+  content:"";
+  width:20px;height:1px;
+  background:#668cff;
+}
 
-    button {
-      min-height: 46px;
-      border: 0;
-      border-radius: 11px;
-      cursor: pointer;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 700;
-      transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
-    }
+h1{
+  font-size:clamp(29px,6vw,43px);
+  font-weight:850;
+  letter-spacing:-.055em;
+}
 
-    button:active {
-      transform: scale(0.98);
-    }
+h1 span{color:#7295ff}
 
-    button:focus-visible,
-    .ip-item:focus-visible {
-      outline: 3px solid rgba(82, 104, 232, 0.3);
-      outline-offset: 2px;
-    }
+.hero p{
+  max-width:460px;
+  margin:12px auto 0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
 
-    .primary-button {
-      padding: 0 19px;
-      background: var(--blue);
-      color: #fff;
-      box-shadow: 0 5px 12px rgba(82, 104, 232, 0.2);
-    }
+.panel{
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:linear-gradient(145deg,#131f34,#0f192b);
+  box-shadow:0 25px 70px #0005;
+}
 
-    .primary-button:hover {
-      background: var(--blue-dark);
-      box-shadow: 0 7px 16px rgba(82, 104, 232, 0.27);
-    }
+.panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 23px;
+  border-bottom:1px solid var(--border);
+}
 
-    .secondary-button {
-      padding: 0 16px;
-      background: #f2f4f9;
-      color: #59647c;
-    }
+.panel-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  font-weight:800;
+}
 
-    .secondary-button:hover {
-      background: #e9ecf4;
-    }
+.panel-title svg{
+  width:18px;height:18px;
+  color:#80a0ff;
+}
 
-    .result-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 27px 0 10px;
-    }
+.panel-tag{
+  color:#8497bb;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.08em;
+}
 
-    .result-heading h2 {
-      font-size: 14px;
-      font-weight: 750;
-    }
+.panel-body{padding:24px}
 
-    .result-badge {
-      padding: 5px 9px;
-      border-radius: 20px;
-      background: #f1f3fa;
-      color: #79839a;
-      font-size: 11px;
-      font-weight: 700;
-    }
+.label{
+  display:block;
+  margin-bottom:10px;
+  color:#b9c7e1;
+  font-size:12px;
+  font-weight:750;
+}
 
-    #resultado {
-      min-height: 142px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      background: #fafbfe;
-      line-height: 1.6;
-    }
+.input-wrap{
+  display:flex;
+  gap:10px;
+}
 
-    .empty-state {
-      min-height: 104px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      color: var(--muted);
-      text-align: center;
-    }
+.input-box{
+  position:relative;
+  flex:1;
+  min-width:0;
+}
 
-    .empty-icon {
-      display: grid;
-      width: 36px;
-      height: 36px;
-      place-items: center;
-      margin-bottom: 2px;
-      border-radius: 12px;
-      background: #eef0ff;
-      color: var(--blue);
-      font-size: 18px;
-    }
+.input-box svg{
+  position:absolute;
+  left:15px;
+  top:50%;
+  width:18px;height:18px;
+  transform:translateY(-50%);
+  color:#7186aa;
+  pointer-events:none;
+}
 
-    .empty-state strong {
-      color: #4f5a73;
-      font-size: 13px;
-    }
+input{
+  width:100%;
+  height:53px;
+  padding:0 15px 0 45px;
+  border:1px solid #30415e;
+  border-radius:12px;
+  outline:none;
+  background:#0b1425;
+  color:#fff;
+  font-size:14px;
+  transition:.2s;
+}
 
-    .empty-state span {
-      font-size: 12px;
-    }
+input::placeholder{color:#647590}
 
-    .result-domain {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding-bottom: 14px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-    }
+input:focus{
+  border-color:#6389ff;
+  box-shadow:0 0 0 4px #527cff20;
+}
 
-    .result-domain-label,
-    .record-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
+button:focus-visible{
+  outline:3px solid #8ca8ff;
+  outline-offset:3px;
+}
 
-    .record-group + .record-group {
-      margin-top: 16px;
-    }
+.btn{
+  min-height:48px;
+  padding:0 18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  border:0;
+  border-radius:11px;
+  font-size:12px;
+  font-weight:800;
+  transition:.2s;
+}
 
-    .record-label {
-      display: block;
-      margin-bottom: 8px;
-      color: #4e5a74;
-    }
+.btn svg{width:16px;height:16px}
 
-    .record-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+.btn-primary{
+  background:linear-gradient(135deg,#648aff,#3d65e9);
+  color:white;
+  box-shadow:0 5px 20px #416cfb35;
+}
 
-    .ip-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 36px;
-      padding: 6px 10px;
-      border: 1px solid #e1e5f0;
-      border-radius: 9px;
-      background: #fff;
-      color: #35415e;
-      cursor: pointer;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
-      transition: border-color 0.18s, background 0.18s, color 0.18s;
-    }
+.btn-primary:hover{
+  filter:brightness(1.12);
+  transform:translateY(-1px);
+}
 
-    .ip-item:hover {
-      border-color: #aab4f6;
-      background: #f5f6ff;
-      color: var(--blue-dark);
-    }
+.btn-secondary{
+  border:1px solid #30415e;
+  background:#19263b;
+  color:#b9c8e4;
+}
 
-    .ip-item.copied {
-      border-color: #9bd5b3;
-      background: #effaf3;
-      color: #26824d;
-    }
+.btn-secondary:hover{background:#23334e}
 
-    .copy-icon {
-      color: #98a1b5;
-      font-family: inherit;
-      font-size: 11px;
-    }
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  transform:none;
+}
 
-    .error {
-      display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      color: #bc4652;
-      font-size: 13px;
-    }
+.shortcuts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:13px;
+}
 
-    .error-icon {
-      display: grid;
-      width: 20px;
-      height: 20px;
-      flex: 0 0 20px;
-      place-items: center;
-      border-radius: 50%;
-      background: #fff0f1;
-      font-size: 12px;
-      font-weight: 800;
-    }
+.shortcut{
+  padding:6px 10px;
+  border:1px solid #283a57;
+  border-radius:7px;
+  background:#152239;
+  color:#9badd0;
+  font-size:10px;
+  font-weight:700;
+}
 
-    .loading-state {
-      min-height: 104px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 11px;
-      color: #66718b;
-      font-size: 13px;
-    }
+.shortcut:hover{
+  border-color:#6389ff;
+  color:#a8bdff;
+}
 
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid #dfe3fb;
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+.results-section{margin-top:24px}
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+.results-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
 
-    .info {
-      margin-top: 13px;
-      color: #8791a7;
-      font-size: 12px;
-      text-align: center;
-    }
+.results-title{
+  font-size:13px;
+  font-weight:800;
+}
 
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      z-index: 10;
-      padding: 10px 16px;
-      border-radius: 11px;
-      background: #202943;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 650;
-      box-shadow: 0 8px 24px rgba(22, 32, 59, 0.2);
-      opacity: 0;
-      pointer-events: none;
-      transform: translate(-50%, 8px);
-      transition: opacity 0.2s, transform 0.2s;
-    }
+.results-count{
+  color:#8a9cbb;
+  font-size:10px;
+  font-weight:700;
+}
 
-    .toast.show {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
+.results-box{
+  min-height:180px;
+  padding:17px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#0c1525;
+}
 
-    @media (max-width: 540px) {
-      body {
-        padding: 16px 12px;
-      }
+.empty{
+  min-height:143px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  text-align:center;
+}
 
-      .card {
-        border-radius: 19px;
-      }
+.empty-icon{
+  width:46px;height:46px;
+  display:grid;
+  place-items:center;
+  border:1px solid #2b426d;
+  border-radius:14px;
+  background:#182b4c;
+  color:#82a2ff;
+}
 
-      .card-header {
-        padding: 25px 21px 21px;
-      }
+.empty-icon svg{width:23px;height:23px}
 
-      .card-body {
-        padding: 22px 21px 24px;
-      }
+.empty strong{font-size:13px}
+.empty span{color:var(--muted);font-size:11px}
 
-      .input-group {
-        flex-wrap: wrap;
-      }
+.loading{
+  min-height:143px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  color:#a9b8d4;
+  font-size:12px;
+}
 
-      input {
-        flex-basis: 100%;
-      }
+.spinner{
+  width:28px;height:28px;
+  border:3px solid #283a60;
+  border-top-color:#7194ff;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
 
-      .primary-button {
-        flex: 1;
-      }
+@keyframes spin{to{transform:rotate(360deg)}}
 
-      .secondary-button {
-        min-width: 92px;
-      }
+.result-domain{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:15px;
+  margin-bottom:17px;
+  border-bottom:1px solid var(--border);
+}
 
-      #resultado {
-        padding: 15px;
-      }
-    }
+.domain-label{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:700;
+}
 
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
+.domain-name{
+  color:#dce6ff;
+  font-size:12px;
+  font-weight:750;
+  overflow-wrap:anywhere;
+}
+
+.record-group{margin-top:18px}
+.record-group:first-of-type{margin-top:0}
+
+.record-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.record-name{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#c5d4ef;
+  font-size:12px;
+  font-weight:800;
+}
+
+.record-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#7295ff;
+}
+
+.record-total{
+  color:#7d90b2;
+  font-size:10px;
+}
+
+.record-list{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.record-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+  min-height:38px;
+  padding:9px 11px;
+  border:1px solid #273954;
+  border-radius:8px;
+  background:#142239;
+  color:#d8e3fa;
+  text-align:left;
+  transition:.2s;
+}
+
+.record-item:hover{
+  border-color:#668aff;
+  background:#1a2d4c;
+}
+
+.record-value{
+  min-width:0;
+  overflow-wrap:anywhere;
+  font-family:ui-monospace,monospace;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.record-copy{
+  flex-shrink:0;
+  color:#8196bc;
+  font-size:10px;
+}
+
+.record-item.copied{
+  border-color:#2c976c;
+  color:#75e5b1;
+}
+
+.copy-all{
+  width:100%;
+  margin-top:16px;
+}
+
+.error{
+  min-height:143px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  color:#ff8592;
+  font-size:12px;
+  text-align:left;
+}
+
+.error svg{width:23px;height:23px;flex-shrink:0}
+
+.error-content strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.error-content span{
+  color:#a5aeca;
+  line-height:1.6;
+}
+
+.history{
+  margin-top:20px;
+  padding-top:19px;
+  border-top:1px solid var(--border);
+}
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.history-title{
+  color:#aebdd7;
+  font-size:11px;
+  font-weight:800;
+}
+
+.history-clear{
+  border:0;
+  background:none;
+  color:#8294b4;
+  font-size:10px;
+}
+
+.history-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.history-item{
+  padding:7px 10px;
+  border:1px solid #293a55;
+  border-radius:7px;
+  background:#142138;
+  color:#9fb1d1;
+  font-size:10px;
+}
+
+.history-item:hover{
+  border-color:#668aff;
+  color:white;
+}
+
+.footer{
+  padding:20px 5px;
+  color:#62738f;
+  font-size:10px;
+  text-align:center;
+  line-height:1.8;
+}
+
+.footer strong{color:#8da5d2}
+
+.toast{
+  position:fixed;
+  bottom:22px;
+  left:50%;
+  z-index:10;
+  padding:12px 18px;
+  border:1px solid #36527c;
+  border-radius:10px;
+  background:#172943;
+  color:#e5edff;
+  font-size:12px;
+  font-weight:750;
+  box-shadow:0 10px 30px #0006;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,12px);
+  transition:.2s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+@media(max-width:600px){
+  body{padding:20px 12px}
+  .topbar{margin-bottom:28px}
+  .hero{margin-bottom:23px}
+  .panel{border-radius:16px}
+  .panel-header{padding:17px}
+  .panel-body{padding:17px}
+  .input-wrap{flex-wrap:wrap}
+  .input-box{flex-basis:100%}
+  .input-wrap .btn-primary{flex:1}
+  .results-box{padding:13px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+  }
+}
+</style>
 </head>
 
 <body>
-  <main class="app">
-    <section class="card" aria-labelledby="titulo">
-      <header class="card-header">
-        <div class="eyebrow">
-          <span class="eyebrow-dot"></span>
-          Consulta DNS
-        </div>
-        <h1 id="titulo">Descubra o IP de um domínio</h1>
-        <p class="subtitle">
-          Consulte os endereços IPv4 e IPv6 associados a um site.
-        </p>
-      </header>
+<main class="app">
 
-      <div class="card-body">
-        <label class="input-label" for="site">Domínio ou endereço do site</label>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/>
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v6m0 6v6M3 12h6m6 0h6"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">DNS LOOKUP</div>
+      <div class="brand-sub">NETWORK TOOLS</div>
+    </div>
+  </div>
 
-        <div class="input-group">
-          <input
-            type="text"
-            id="site"
-            placeholder="Ex.: exemplo.com.br"
-            autocomplete="url"
-            spellcheck="false"
-            aria-label="Domínio ou endereço do site"
-          >
-          <button class="primary-button" id="buscar" type="button">Consultar</button>
-          <button class="secondary-button" id="limpar" type="button">Limpar</button>
-        </div>
+  <div class="online">
+    <span class="online-dot"></span>
+    ONLINE
+  </div>
+</header>
 
-        <div class="result-heading">
-          <h2>Resultado da consulta</h2>
-          <span class="result-badge">DNS público</span>
-        </div>
+<section class="hero">
+  <div class="eyebrow">FERRAMENTA DE REDE</div>
+  <h1>Consulta <span>DNS</span></h1>
+  <p>Encontre os endereços IP e registros DNS de qualquer domínio em poucos segundos.</p>
+</section>
 
-        <div id="resultado" aria-live="polite">
-          <div class="empty-state">
-            <div class="empty-icon" aria-hidden="true">◎</div>
-            <strong>A consulta aparecerá aqui</strong>
-            <span>Digite um domínio para começar.</span>
+<section class="panel">
+
+  <header class="panel-header">
+    <div class="panel-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="m16 16 5 5M11 7v8m-4-4h8"/>
+      </svg>
+      CONSULTA DE DOMÍNIO
+    </div>
+    <span class="panel-tag">DNS PÚBLICO</span>
+  </header>
+
+  <div class="panel-body">
+
+    <label class="label" for="site">DOMÍNIO OU ENDEREÇO DO SITE</label>
+
+    <div class="input-wrap">
+      <div class="input-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+        </svg>
+        <input
+          id="site"
+          type="text"
+          placeholder="Ex.: exemplo.com.br"
+          autocomplete="url"
+          spellcheck="false"
+          autocapitalize="none"
+        >
+      </div>
+
+      <button class="btn btn-primary" id="buscar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m16 16 5 5"/>
+        </svg>
+        Consultar
+      </button>
+
+      <button class="btn btn-secondary" id="limpar">Limpar</button>
+    </div>
+
+    <div class="shortcuts">
+      <button class="shortcut" data-domain="google.com">google.com</button>
+      <button class="shortcut" data-domain="cloudflare.com">cloudflare.com</button>
+      <button class="shortcut" data-domain="github.com">github.com</button>
+    </div>
+
+    <section class="results-section">
+      <div class="results-top">
+        <h2 class="results-title">Resultado da consulta</h2>
+        <span class="results-count" id="contador">AGUARDANDO CONSULTA</span>
+      </div>
+
+      <div class="results-box" id="resultado" aria-live="polite">
+        <div class="empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+            </svg>
           </div>
+          <strong>Nenhuma consulta realizada</strong>
+          <span>Digite um domínio para visualizar os registros.</span>
         </div>
-
-        <p class="info">Toque ou clique em um endereço para copiá-lo.</p>
       </div>
     </section>
-  </main>
 
-  <div class="toast" id="toast" role="status" aria-live="polite">Endereço copiado</div>
+    <section class="history" id="historico" hidden>
+      <div class="history-header">
+        <span class="history-title">CONSULTAS RECENTES</span>
+        <button class="history-clear" id="limparHistorico">Limpar histórico</button>
+      </div>
+      <div class="history-list" id="listaHistorico"></div>
+    </section>
 
-  <script>
-    const campoSite = document.getElementById("site");
-    const resultado = document.getElementById("resultado");
-    const toast = document.getElementById("toast");
-    let toastTimer;
+  </div>
+</section>
 
-    function limparDominio(input) {
-      if (!input) return "";
+<footer class="footer">
+  <strong>DNS LOOKUP</strong> · NETWORK TOOLS<br>
+  Consultas realizadas através do serviço público Google DNS.
+</footer>
 
-      let valor = input.trim();
+</main>
 
-      try {
-        const url = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(valor)
-          ? valor
-          : `https://${valor}`);
-        valor = url.hostname;
-      } catch {
-        valor = valor
-          .replace(/^(https?:\/\/)/i, "")
-          .split(/[/?#]/)[0]
-          .split(":")[0];
-      }
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-      return valor.replace(/^www\./i, "").trim().toLowerCase();
+<script>
+const campo = document.getElementById("site");
+const resultado = document.getElementById("resultado");
+const contador = document.getElementById("contador");
+const toast = document.getElementById("toast");
+
+const botaoBuscar = document.getElementById("buscar");
+const botaoLimpar = document.getElementById("limpar");
+
+const historico = [];
+let consultaAtual = 0;
+let toastTimer;
+
+const TIPOS = [
+  {type:"A", label:"IPv4", code:1},
+  {type:"AAAA", label:"IPv6", code:28},
+  {type:"CNAME", label:"CNAME", code:5},
+  {type:"MX", label:"MX", code:15},
+  {type:"NS", label:"NS", code:2},
+  {type:"TXT", label:"TXT", code:16}
+];
+
+function icone(nome){
+  const svg = document.createElement("span");
+  svg.textContent = nome;
+  return svg;
+}
+
+function normalizarDominio(valor){
+  let entrada = valor.trim();
+
+  if(!entrada) return "";
+
+  if(!/^[a-z][a-z\d+.-]*:\/\//i.test(entrada)){
+    entrada = "https://" + entrada;
+  }
+
+  const url = new URL(entrada);
+
+  if(url.username || url.password) {
+    throw new Error("Endereço inválido.");
+  }
+
+  return url.hostname
+    .replace(/^\[|\]$/g,"")
+    .replace(/\.$/,"")
+    .toLowerCase();
+}
+
+function dominioValido(dominio){
+  if(!dominio || dominio.length > 253) return false;
+
+  if(/^\d{1,3}(\.\d{1,3}){3}$/.test(dominio)){
+    return dominio.split(".").every(p =>
+      Number(p) >= 0 && Number(p) <= 255
+    );
+  }
+
+  if(dominio.includes(":")) return false;
+
+  return dominio.split(".").every(parte =>
+    parte.length <= 63 &&
+    /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(parte)
+  ) && dominio.includes(".");
+}
+
+function toastMensagem(mensagem){
+  toast.textContent = mensagem;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(()=>{
+    toast.classList.remove("show");
+  },2000);
+}
+
+
+function copiarFallback(texto){
+  const area = document.createElement("textarea");
+
+  area.value = texto;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.top = "0";
+  area.style.left = "0";
+  area.style.width = "2px";
+  area.style.height = "2px";
+  area.style.padding = "0";
+  area.style.border = "0";
+  area.style.opacity = "0.01";
+  area.style.fontSize = "16px";
+
+  document.body.appendChild(area);
+
+  area.focus();
+  area.select();
+  area.setSelectionRange(0, area.value.length);
+
+  let sucesso = false;
+
+  try {
+    sucesso = document.execCommand("copy");
+  } catch {
+    sucesso = false;
+  }
+
+  area.remove();
+
+  return sucesso;
+}
+
+async function copiar(texto, elemento){
+  let sucesso = copiarFallback(texto);
+
+  if(!sucesso && navigator.clipboard && window.isSecureContext){
+    try{
+      await navigator.clipboard.writeText(texto);
+      sucesso = true;
+    }catch{
+      sucesso = false;
+    }
+  }
+
+  if(sucesso){
+    if(elemento){
+      elemento.classList.add("copied");
+
+      setTimeout(()=>{
+        elemento.classList.remove("copied");
+      },900);
     }
 
-    function dominioValido(dominio) {
-      if (!dominio || dominio.length > 253) return false;
+    toastMensagem("Copiado com sucesso!");
+  }else{
+    toastMensagem("Cópia bloqueada pelo navegador. Verifique o HTTPS.");
+  }
+}
 
-      const partes = dominio.split(".");
 
-      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(dominio)) {
-        return partes.every(parte => Number(parte) >= 0 && Number(parte) <= 255);
-      }
+function mostrarLoading(dominio){
+  resultado.replaceChildren();
 
-      return /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i
-        .test(dominio);
-    }
+  const loading = document.createElement("div");
+  loading.className = "loading";
 
-    function mostrarToast(mensagem) {
-      toast.textContent = mensagem;
-      toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
-    }
+  const spinner = document.createElement("div");
+  spinner.className = "spinner";
 
-    async function copiar(texto, elemento) {
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(texto);
-        } else {
-          const temporario = document.createElement("textarea");
-          temporario.value = texto;
-          temporario.style.position = "fixed";
-          temporario.style.opacity = "0";
-          document.body.appendChild(temporario);
-          temporario.select();
-          document.execCommand("copy");
-          temporario.remove();
-        }
+  const texto = document.createElement("span");
+  texto.textContent = "Consultando registros de " + dominio + "...";
 
-        elemento.classList.add("copied");
-        setTimeout(() => elemento.classList.remove("copied"), 900);
-        mostrarToast("Endereço copiado");
-      } catch {
-        mostrarToast("Não foi possível copiar o endereço");
-      }
-    }
+  loading.append(spinner,texto);
+  resultado.appendChild(loading);
 
-    function criarItemCopiavel(texto, mostrarIcone = true) {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "ip-item";
-      item.textContent = texto;
-      item.setAttribute("aria-label", `Copiar ${texto}`);
+  contador.textContent = "CONSULTANDO...";
+}
 
-      if (mostrarIcone) {
-        const icone = document.createElement("span");
-        icone.className = "copy-icon";
-        icone.textContent = "Copiar";
-        item.appendChild(icone);
-      }
+function mostrarErro(titulo,descricao){
+  resultado.replaceChildren();
 
-      item.addEventListener("click", () => copiar(texto, item));
-      return item;
-    }
+  const erro = document.createElement("div");
+  erro.className = "error";
 
-    function mostrarErro(mensagem) {
-      resultado.replaceChildren();
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 24 24");
+  svg.setAttribute("fill","none");
+  svg.setAttribute("stroke","currentColor");
+  svg.setAttribute("stroke-width","1.8");
 
-      const erro = document.createElement("div");
-      erro.className = "error";
+  const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d","M12 3 2.5 20h19L12 3Zm0 6v5m0 3v.1");
+  svg.appendChild(path);
 
-      const icone = document.createElement("span");
-      icone.className = "error-icon";
-      icone.setAttribute("aria-hidden", "true");
-      icone.textContent = "!";
+  const conteudo = document.createElement("div");
+  conteudo.className = "error-content";
 
-      const texto = document.createElement("span");
-      texto.textContent = mensagem;
+  const strong = document.createElement("strong");
+  strong.textContent = titulo;
 
-      erro.append(icone, texto);
-      resultado.appendChild(erro);
-    }
+  const texto = document.createElement("span");
+  texto.textContent = descricao;
 
-    function criarGrupoRegistros(titulo, registros) {
-      const grupo = document.createElement("section");
-      grupo.className = "record-group";
+  conteudo.append(strong,texto);
+  erro.append(svg,conteudo);
 
-      const label = document.createElement("span");
-      label.className = "record-label";
-      label.textContent = titulo;
+  resultado.appendChild(erro);
+  contador.textContent = "CONSULTA FINALIZADA";
+}
 
-      const lista = document.createElement("div");
-      lista.className = "record-list";
+function criarRegistro(tipo,registros){
+  const grupo = document.createElement("section");
+  grupo.className = "record-group";
 
-      registros.forEach(ip => lista.appendChild(criarItemCopiavel(ip)));
+  const cabecalho = document.createElement("div");
+  cabecalho.className = "record-header";
 
-      grupo.append(label, lista);
-      return grupo;
-    }
+  const nome = document.createElement("div");
+  nome.className = "record-name";
 
-    async function buscarIP() {
-      const dominio = limparDominio(campoSite.value);
+  const ponto = document.createElement("span");
+  ponto.className = "record-dot";
 
-      if (!dominio) {
-        mostrarErro("Digite um domínio ou endereço de site.");
-        return;
-      }
+  nome.append(ponto,document.createTextNode(tipo.label));
 
-      if (!dominioValido(dominio)) {
-        mostrarErro("Esse domínio parece inválido. Confira e tente novamente.");
-        return;
-      }
+  const total = document.createElement("span");
+  total.className = "record-total";
+  total.textContent = registros.length + " REGISTRO(S)";
 
-      resultado.innerHTML = `
-        <div class="loading-state">
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Consultando os registros de ${dominio}…</span>
-        </div>
-      `;
+  cabecalho.append(nome,total);
 
-      try {
-        const [resA, resAAAA] = await Promise.all([
-          fetch(`https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=A`),
-          fetch(`https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=AAAA`)
-        ]);
+  const lista = document.createElement("div");
+  lista.className = "record-list";
 
-        if (!resA.ok || !resAAAA.ok) {
-          throw new Error("O serviço de consulta DNS não respondeu.");
-        }
+  registros.forEach(registro=>{
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "record-item";
 
-        const [dataA, dataAAAA] = await Promise.all([
-          resA.json(),
-          resAAAA.json()
-        ]);
+    const valor = document.createElement("span");
+    valor.className = "record-value";
+    valor.textContent = registro;
 
-        const ipv4 = (dataA.Answer || [])
-          .filter(registro => registro.type === 1)
-          .map(registro => registro.data);
+    const copiarLabel = document.createElement("span");
+    copiarLabel.className = "record-copy";
+    copiarLabel.textContent = "Copiar";
 
-        const ipv6 = (dataAAAA.Answer || [])
-          .filter(registro => registro.type === 28)
-          .map(registro => registro.data);
+    botao.append(valor,copiarLabel);
+    botao.addEventListener("click",()=>copiar(registro,botao));
 
-        if (ipv4.length === 0 && ipv6.length === 0) {
-          mostrarErro(`Nenhum endereço IP foi encontrado para ${dominio}.`);
-          return;
-        }
+    lista.appendChild(botao);
+  });
 
-        resultado.replaceChildren();
+  grupo.append(cabecalho,lista);
+  return grupo;
+}
 
-        const linhaDominio = document.createElement("div");
-        linhaDominio.className = "result-domain";
+function atualizarHistorico(dominio){
+  const posicao = historico.indexOf(dominio);
 
-        const labelDominio = document.createElement("span");
-        labelDominio.className = "result-domain-label";
-        labelDominio.textContent = "Domínio consultado";
+  if(posicao !== -1) historico.splice(posicao,1);
 
-        linhaDominio.append(
-          labelDominio,
-          criarItemCopiavel(dominio, false)
-        );
+  historico.unshift(dominio);
 
-        resultado.appendChild(linhaDominio);
+  if(historico.length > 6) historico.pop();
 
-        if (ipv4.length > 0) {
-          resultado.appendChild(criarGrupoRegistros("IPv4", ipv4));
-        }
+  const secao = document.getElementById("historico");
+  const lista = document.getElementById("listaHistorico");
 
-        if (ipv6.length > 0) {
-          resultado.appendChild(criarGrupoRegistros("IPv6", ipv6));
-        }
-      } catch (erro) {
-        mostrarErro(erro.message || "Erro de conexão. Tente novamente.");
-      }
-    }
+  lista.replaceChildren();
 
-    function limpar() {
-      campoSite.value = "";
-      resultado.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon" aria-hidden="true">◎</div>
-          <strong>A consulta aparecerá aqui</strong>
-          <span>Digite um domínio para começar.</span>
-        </div>
-      `;
-      campoSite.focus();
-    }
+  historico.forEach(item=>{
+    const botao = document.createElement("button");
+    botao.className = "history-item";
+    botao.type = "button";
+    botao.textContent = item;
 
-    document.getElementById("buscar").addEventListener("click", buscarIP);
-    document.getElementById("limpar").addEventListener("click", limpar);
-
-    campoSite.addEventListener("keydown", evento => {
-      if (evento.key === "Enter") buscarIP();
+    botao.addEventListener("click",()=>{
+      campo.value = item;
+      buscarIP();
     });
-  </script>
+
+    lista.appendChild(botao);
+  });
+
+  secao.hidden = false;
+}
+
+async function consultarTipo(dominio,tipo,signal){
+  const url = new URL("https://dns.google/resolve");
+
+  url.searchParams.set("name",dominio);
+  url.searchParams.set("type",tipo.type);
+
+  const resposta = await fetch(url,{
+    signal,
+    headers:{"Accept":"application/dns-json"}
+  });
+
+  if(!resposta.ok){
+    throw new Error("O serviço DNS retornou HTTP " + resposta.status);
+  }
+
+  const dados = await resposta.json();
+
+  if(dados.Status === 2){
+    throw new Error("Falha temporária na consulta DNS.");
+  }
+
+  const registros = (dados.Answer || [])
+    .filter(item=>item.type === tipo.code)
+    .map(item=>{
+      let valor = item.data;
+
+      if(tipo.type === "TXT"){
+        valor = valor.replace(/\\(\d{3})/g,(_,n)=>
+          String.fromCharCode(Number(n))
+        );
+      }
+
+      return valor;
+    });
+
+  return {
+    tipo,
+    registros,
+    status:dados.Status
+  };
+}
+
+async function buscarIP(){
+  const numero = ++consultaAtual;
+
+  const entrada = campo.value.trim();
+
+  if(!entrada){
+    mostrarErro("Digite um domínio","Informe o endereço do site que deseja consultar.");
+    campo.focus();
+    return;
+  }
+
+  let dominio;
+
+  try{
+    dominio = normalizarDominio(entrada);
+  }catch{
+    mostrarErro("Endereço inválido","Confira o domínio informado e tente novamente.");
+    return;
+  }
+
+  if(!dominioValido(dominio)){
+    mostrarErro("Domínio inválido","Digite um domínio válido, como exemplo.com.br.");
+    return;
+  }
+
+  const controller = new AbortController();
+
+  if(window.consultaController){
+    window.consultaController.abort();
+  }
+
+  window.consultaController = controller;
+
+  botaoBuscar.disabled = true;
+  mostrarLoading(dominio);
+
+  try{
+    const respostas = await Promise.all(
+      TIPOS.map(tipo=>
+        consultarTipo(dominio,tipo,controller.signal)
+      )
+    );
+
+    if(numero !== consultaAtual) return;
+
+    const total = respostas.reduce(
+      (soma,item)=>soma+item.registros.length,0
+    );
+
+    if(total === 0){
+      const temFalha = respostas.some(item=>item.status !== 0);
+
+      mostrarErro(
+        "Nenhum registro encontrado",
+        temFalha
+          ? "O domínio não retornou registros DNS para os tipos consultados."
+          : "Nenhum endereço ou registro foi encontrado para esse domínio."
+      );
+
+      return;
+    }
+
+    resultado.replaceChildren();
+
+    const linha = document.createElement("div");
+    linha.className = "result-domain";
+
+    const label = document.createElement("span");
+    label.className = "domain-label";
+    label.textContent = "DOMÍNIO CONSULTADO";
+
+    const nome = document.createElement("span");
+    nome.className = "domain-name";
+    nome.textContent = dominio;
+
+    linha.append(label,nome);
+    resultado.appendChild(linha);
+
+    respostas.forEach(item=>{
+      if(item.registros.length){
+        resultado.appendChild(
+          criarRegistro(item.tipo,item.registros)
+        );
+      }
+    });
+
+    const todos = respostas
+      .flatMap(item=>item.registros);
+
+    const copiarTudo = document.createElement("button");
+    copiarTudo.className = "btn btn-secondary copy-all";
+    copiarTudo.type = "button";
+    copiarTudo.textContent = "Copiar todos os registros";
+
+    copiarTudo.addEventListener("click",()=>{
+      const texto = respostas
+        .filter(item=>item.registros.length)
+        .map(item=>
+          item.tipo.label + ":\n" +
+          item.registros.join("\n")
+        )
+        .join("\n\n");
+
+      copiar(texto,copiarTudo);
+    });
+
+    resultado.appendChild(copiarTudo);
+
+    contador.textContent = total + " REGISTRO(S) ENCONTRADO(S)";
+
+    atualizarHistorico(dominio);
+
+  }catch(erro){
+    if(erro.name === "AbortError") return;
+
+    if(numero !== consultaAtual) return;
+
+    mostrarErro(
+      "Falha na consulta DNS",
+      "Verifique sua conexão com a internet e tente novamente. " +
+      (erro.message || "")
+    );
+
+  }finally{
+    if(numero === consultaAtual){
+      botaoBuscar.disabled = false;
+    }
+  }
+}
+
+function limpar(){
+  consultaAtual++;
+
+  if(window.consultaController){
+    window.consultaController.abort();
+  }
+
+  campo.value = "";
+  resultado.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+        </svg>
+      </div>
+      <strong>Nenhuma consulta realizada</strong>
+      <span>Digite um domínio para visualizar os registros.</span>
+    </div>
+  `;
+
+  contador.textContent = "AGUARDANDO CONSULTA";
+  botaoBuscar.disabled = false;
+  campo.focus();
+}
+
+botaoBuscar.addEventListener("click",buscarIP);
+botaoLimpar.addEventListener("click",limpar);
+
+campo.addEventListener("keydown",evento=>{
+  if(evento.key === "Enter") buscarIP();
+});
+
+document.querySelectorAll("[data-domain]").forEach(botao=>{
+  botao.addEventListener("click",()=>{
+    campo.value = botao.dataset.domain;
+    buscarIP();
+  });
+});
+
+document.getElementById("limparHistorico")
+  .addEventListener("click",()=>{
+    historico.length = 0;
+    document.getElementById("historico").hidden = true;
+    document.getElementById("listaHistorico").replaceChildren();
+  });
+
+</script>
 </body>
 </html>
